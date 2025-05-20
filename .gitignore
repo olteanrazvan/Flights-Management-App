@@ -1,17 +1,35 @@
+# Java build files
 target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-# https://github.com/takari/maven-wrapper#usage-without-binary-jar
-.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+*.ear
 
-# Eclipse m2e generated files
-# Eclipse Core
-.project
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
+# Maven specific
+.mvn/
+**/target/
+**/dependency-reduced-pom.xml
+**/build.log
+**/release.properties
+
+# Eclipse
+*.classpath
+*.project
+*.settings/
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+out/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Spring Boot specific
+# Ignore environment config
+**/application.properties
+**/application.yml
+**/application-*.yml
+**/application-*.properties
