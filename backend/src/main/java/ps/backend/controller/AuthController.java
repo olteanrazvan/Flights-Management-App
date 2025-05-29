@@ -23,13 +23,9 @@ public class AuthController {
         this.authService = authService;
     }
 
-    /**
-     * Register a new user
-     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request) {
         try {
-            // Basic validation
             if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(createErrorResponse("Email is required"));
             }
@@ -56,13 +52,9 @@ public class AuthController {
         }
     }
 
-    /**
-     * Authenticate a user
-     */
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticate(@RequestBody AuthRequestDTO request) {
         try {
-            // Basic validation
             if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(createErrorResponse("Email is required"));
             }
@@ -81,9 +73,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * Refresh an authentication token
-     */
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
         try {
@@ -102,9 +91,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * Test endpoint to verify auth is working
-     */
     @GetMapping("/test")
     public ResponseEntity<Map<String, String>> test() {
         Map<String, String> response = new HashMap<>();
@@ -120,16 +106,11 @@ public class AuthController {
         return error;
     }
 
-    /**
-     * Simple DTO for refresh token requests
-     */
     static class RefreshTokenRequest {
         private String refreshToken;
 
-        // Default constructor
         public RefreshTokenRequest() {}
 
-        // Getters and setters
         public String getRefreshToken() {
             return refreshToken;
         }

@@ -160,6 +160,10 @@ public class UserService {
                 .map(Ticket::getId)
                 .collect(Collectors.toList()));
 
+        dto.setNotificationIds(user.getNotifications().stream()
+                .map(ps.backend.model.Notification::getId)
+                .collect(Collectors.toList()));
+
         return dto;
     }
 }

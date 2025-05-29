@@ -12,6 +12,7 @@ import {
     Badge,
     Box,
     Divider,
+    Popover,
 } from '@mui/material';
 import {
     Flight,
@@ -26,13 +27,14 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
+import { NotificationDropdown } from '../notifications/NotificationDropdown';
 
 export const Navigation: React.FC = () => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
 
     const { user, logout, isAuthenticated } = useAuth();
-    const { unseenCount } = useNotifications();
+    const { notifications, unseenCount } = useNotifications();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -61,6 +63,10 @@ export const Navigation: React.FC = () => {
         logout();
         handleUserMenuClose();
         navigate('/');
+    };
+
+    const handleViewAllNotifications = () => {
+        navigate('/notifications');
     };
 
     const isActive = (path: string) => location.pathname === path;
@@ -204,35 +210,29 @@ export const Navigation: React.FC = () => {
                     </MenuItem>
                 </Menu>
 
-                {/* Notification Menu - Will be implemented with NotificationList component */}
-                <Menu
-                    anchorEl={notificationAnchor}
+                {/* Notification Popover */}
+                <Popover
                     open={Boolean(notificationAnchor)}
+                    anchorEl={notificationAnchor}
                     onClose={handleNotificationMenuClose}
-                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
                     PaperProps={{
-                        sx: { width: 350, maxHeight: 400 }
+                        sx: { mt: 1 }
                     }}
                 >
-                    <MenuItem>
-                        <Typography variant="h6">Notifications</Typography>
-                    </MenuItem>
-                    <Divider />
-                    {unseenCount === 0 ? (
-                        <MenuItem>
-                            <Typography variant="body2" color="text.secondary">
-                                No new notifications
-                            </Typography>
-                        </MenuItem>
-                    ) : (
-                        <MenuItem onClick={() => handleNavigation('/notifications')}>
-                            <Typography variant="body2" color="primary">
-                                View all notifications ({unseenCount} new)
-                            </Typography>
-                        </MenuItem>
-                    )}
-                </Menu>
+                    <NotificationDropdown
+                        notifications={notifications}
+                        onViewAll={handleViewAllNotifications}
+                        onClose={handleNotificationMenuClose}
+                    />
+                </Popover>
             </Toolbar>
         </AppBar>
     );

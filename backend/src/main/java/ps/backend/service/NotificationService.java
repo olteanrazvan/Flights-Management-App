@@ -12,6 +12,7 @@ import ps.backend.model.User;
 import ps.backend.observer.TicketEventType;
 import ps.backend.observer.TicketObserver;
 import ps.backend.repository.NotificationRepository;
+import ps.backend.repository.TicketRepository;  // ADD THIS
 import ps.backend.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class NotificationService implements TicketObserver {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final TicketRepository ticketRepository;  // ADD THIS
 
     // Email service could be injected here if available
     // private final EmailService emailService;
@@ -34,9 +36,11 @@ public class NotificationService implements TicketObserver {
     @Autowired
     public NotificationService(
             NotificationRepository notificationRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            TicketRepository ticketRepository) {  // ADD THIS PARAMETER
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
+        this.ticketRepository = ticketRepository;  // ADD THIS
     }
 
     @Override
@@ -149,9 +153,12 @@ public class NotificationService implements TicketObserver {
      * @return A list of notifications for the ticket
      */
     public List<NotificationDTO> getNotificationsForTicket(Long ticketId) {
-        // Implementation would need a Ticket repository or service to find the ticket
-        // For now, returning an empty list
-        return List.of();
+        Ticket ticket = ticketRepository.findById(ticketId)  // FIX THIS
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+        return notificationRepository.findByTicket(ticket).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     /**

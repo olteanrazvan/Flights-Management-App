@@ -24,6 +24,7 @@ import { BookingPage } from './pages/tickets/BookingPage';
 import { ClientDashboard } from './pages/dashboard/ClientDashboard';
 import { AdminDashboard } from './pages/dashboard/AdminDashboard';
 import { FlightManagementPage } from './pages/flights/FlightManagementPage';
+import { NotificationsPage } from './pages/notifications/NotificationsPage';
 
 function App() {
     return (
@@ -76,6 +77,15 @@ function App() {
                                             element={
                                                 <AuthGuard>
                                                     <BookingPage />
+                                                </AuthGuard>
+                                            }
+                                        />
+
+                                        <Route
+                                            path="/notifications"
+                                            element={
+                                                <AuthGuard>
+                                                    <NotificationsPage />
                                                 </AuthGuard>
                                             }
                                         />

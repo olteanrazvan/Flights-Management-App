@@ -34,11 +34,6 @@ public class NotificationController {
         this.userService = userService;
     }
 
-    /**
-     * Get all notifications for the current user
-     *
-     * @return List of notifications for the user
-     */
     @GetMapping
     public ResponseEntity<List<NotificationDTO>> getUserNotifications() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -53,11 +48,6 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    /**
-     * Get all unread notifications for the current user
-     *
-     * @return List of unread notifications for the user
-     */
     @GetMapping("/unseen")
     public ResponseEntity<List<NotificationDTO>> getUnseenNotifications() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -72,15 +62,8 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    /**
-     * Mark a notification as read
-     *
-     * @param id Notification ID
-     * @return The updated notification
-     */
     @PostMapping("/{id}/mark-seen")
     public ResponseEntity<NotificationDTO> markNotificationAsSeen(@PathVariable Long id) {
-        // Check if user is authorized to mark this notification as read
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         Optional<UserDTO> userOpt = userService.getUserByEmail(email);
@@ -96,12 +79,6 @@ public class NotificationController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Get notifications by type (admin only)
-     *
-     * @param type Notification type
-     * @return List of notifications of the specified type
-     */
     @GetMapping("/type/{type}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<NotificationDTO>> getNotificationsByType(@PathVariable NotificationType type) {
@@ -109,12 +86,6 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    /**
-     * Get notifications for a specific user (admin only)
-     *
-     * @param userId User ID
-     * @return List of notifications for the user
-     */
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<NotificationDTO>> getNotificationsForUser(@PathVariable Long userId) {
@@ -122,15 +93,8 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    /**
-     * Get notifications for a specific ticket
-     *
-     * @param ticketId Ticket ID
-     * @return List of notifications for the ticket
-     */
     @GetMapping("/ticket/{ticketId}")
     public ResponseEntity<List<NotificationDTO>> getNotificationsForTicket(@PathVariable Long ticketId) {
-        // Check if user is authorized to view these notifications
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         Optional<UserDTO> userOpt = userService.getUserByEmail(email);
@@ -139,8 +103,6 @@ public class NotificationController {
             return ResponseEntity.status(403).build();
         }
 
-        // For now, only admins can view notifications for a specific ticket
-        // This could be modified to allow ticket owners to view their own ticket notifications
         if (userOpt.get().getRole() != Role.ADMIN) {
             return ResponseEntity.status(403).build();
         }
@@ -149,13 +111,6 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    /**
-     * Get notifications created between specific dates
-     *
-     * @param start Start date and time (ISO format)
-     * @param end End date and time (ISO format)
-     * @return List of notifications created in the specified time range
-     */
     @GetMapping("/date-range")
     public ResponseEntity<List<NotificationDTO>> getNotificationsByDateRange(
             @RequestParam String start,
@@ -182,11 +137,6 @@ public class NotificationController {
         }
     }
 
-    /**
-     * Mark all notifications as read for the current user
-     *
-     * @return Success or failure response
-     */
     @PostMapping("/mark-all-seen")
     public ResponseEntity<?> markAllNotificationsSeen() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -197,10 +147,8 @@ public class NotificationController {
             return ResponseEntity.status(403).build();
         }
 
-        // Get all unseen notifications
         List<NotificationDTO> unseenNotifications = notificationService.getUnseenNotificationsForUser(userOpt.get().getId());
 
-        // Mark each as seen
         for (NotificationDTO notification : unseenNotifications) {
             notificationService.markAsSeen(notification.getId());
         }

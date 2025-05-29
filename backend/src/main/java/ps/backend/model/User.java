@@ -39,10 +39,11 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Ticket> tickets = new HashSet<>();
 
-    // Default constructor
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Notification> notifications = new HashSet<>();
+
     public User() {}
 
-    // Parameterized constructor
     public User(String email, String password, String firstName, String lastName,
                 String phoneNumber, Role role) {
         this.email = email;
@@ -53,7 +54,6 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -119,7 +119,14 @@ public class User implements UserDetails {
         this.tickets = tickets;
     }
 
-    // UserDetails implementation methods
+    public Set<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(Set<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
@@ -150,7 +157,6 @@ public class User implements UserDetails {
         return true;
     }
 
-    // Helper methods
     public String getFullName() {
         return firstName + " " + lastName;
     }

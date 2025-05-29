@@ -24,23 +24,12 @@ public class FlightController {
         this.flightService = flightService;
     }
 
-    /**
-     * Get all flights
-     *
-     * @return List of all flights
-     */
     @GetMapping
     public ResponseEntity<List<FlightDTO>> getAllFlights() {
         List<FlightDTO> flights = flightService.getAllFlights();
         return ResponseEntity.ok(flights);
     }
 
-    /**
-     * Get a flight by ID
-     *
-     * @param id Flight ID
-     * @return The flight if found
-     */
     @GetMapping("/{id}")
     public ResponseEntity<FlightDTO> getFlightById(@PathVariable Long id) {
         Optional<FlightDTO> flightOpt = flightService.getFlightById(id);
@@ -50,12 +39,6 @@ public class FlightController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Create a new flight (admin only)
-     *
-     * @param flightDTO DTO containing flight details
-     * @return The created flight
-     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FlightDTO> createFlight(@RequestBody FlightDTO flightDTO) {
@@ -63,13 +46,6 @@ public class FlightController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFlight);
     }
 
-    /**
-     * Update an existing flight (admin only)
-     *
-     * @param id Flight ID
-     * @param flightDTO DTO containing updated flight details
-     * @return The updated flight
-     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FlightDTO> updateFlight(@PathVariable Long id, @RequestBody FlightDTO flightDTO) {
@@ -77,12 +53,6 @@ public class FlightController {
         return ResponseEntity.ok(updatedFlight);
     }
 
-    /**
-     * Delete a flight (admin only)
-     *
-     * @param id Flight ID
-     * @return No content if successful
-     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteFlight(@PathVariable Long id) {
@@ -95,15 +65,6 @@ public class FlightController {
         }
     }
 
-    /**
-     * Search for flights based on criteria
-     *
-     * @param origin Origin city
-     * @param destination Destination city
-     * @param departureDate Departure date
-     * @param passengers Number of passengers
-     * @return List of flights matching the criteria
-     */
     @GetMapping("/search")
     public ResponseEntity<List<FlightDTO>> searchFlights(
             @RequestParam String origin,

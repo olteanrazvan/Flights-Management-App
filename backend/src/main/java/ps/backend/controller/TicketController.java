@@ -39,24 +39,12 @@ public class TicketController {
         this.pdfService = pdfService;
     }
 
-    /**
-     * Get all tickets (admin only)
-     *
-     * @return List of all tickets
-     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TicketDTO>> getAllTickets() {
-        // This would need to be implemented in the service
         return ResponseEntity.ok(List.of());
     }
 
-    /**
-     * Get ticket by ID (admin or ticket owner only)
-     *
-     * @param id Ticket ID
-     * @return The ticket if found and authorized
-     */
     @GetMapping("/{id}")
     public ResponseEntity<TicketDTO> getTicketById(@PathVariable Long id) {
         Optional<TicketDTO> ticketOpt = ticketService.getTicketById(id);
@@ -67,7 +55,6 @@ public class TicketController {
 
         TicketDTO ticket = ticketOpt.get();
 
-        // Check if user is authorized to access this ticket
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         Optional<UserDTO> userOpt = userService.getUserByEmail(email);
@@ -78,7 +65,6 @@ public class TicketController {
 
         UserDTO user = userOpt.get();
 
-        // Allow access if user is the ticket owner or an admin
         if (!ticket.getUserId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
             return ResponseEntity.status(403).build();
         }
@@ -86,12 +72,6 @@ public class TicketController {
         return ResponseEntity.ok(ticket);
     }
 
-    /**
-     * Get ticket by ticket number
-     *
-     * @param ticketNumber Ticket number
-     * @return The ticket if found
-     */
     @GetMapping("/number/{ticketNumber}")
     public ResponseEntity<TicketDTO> getTicketByNumber(@PathVariable String ticketNumber) {
         Optional<TicketDTO> ticketOpt = ticketService.getTicketByNumber(ticketNumber);
@@ -102,7 +82,6 @@ public class TicketController {
 
         TicketDTO ticket = ticketOpt.get();
 
-        // Check if user is authorized to access this ticket
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         Optional<UserDTO> userOpt = userService.getUserByEmail(email);
@@ -113,7 +92,6 @@ public class TicketController {
 
         UserDTO user = userOpt.get();
 
-        // Allow access if user is the ticket owner or an admin
         if (!ticket.getUserId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
             return ResponseEntity.status(403).build();
         }
@@ -121,11 +99,6 @@ public class TicketController {
         return ResponseEntity.ok(ticket);
     }
 
-    /**
-     * Get all tickets for the current user
-     *
-     * @return List of tickets for the user
-     */
     @GetMapping("/my-tickets")
     public ResponseEntity<List<TicketDTO>> getMyTickets() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -140,12 +113,6 @@ public class TicketController {
         return ResponseEntity.ok(tickets);
     }
 
-    /**
-     * Get all tickets for a specific user (admin only)
-     *
-     * @param userId User ID
-     * @return List of tickets for the user
-     */
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TicketDTO>> getTicketsByUser(@PathVariable Long userId) {
@@ -153,12 +120,6 @@ public class TicketController {
         return ResponseEntity.ok(tickets);
     }
 
-    /**
-     * Get all tickets for a specific flight
-     *
-     * @param flightId Flight ID
-     * @return List of tickets for the flight
-     */
     @GetMapping("/flight/{flightId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TicketDTO>> getTicketsByFlight(@PathVariable Long flightId) {
@@ -166,15 +127,8 @@ public class TicketController {
         return ResponseEntity.ok(tickets);
     }
 
-    /**
-     * Create a new ticket
-     *
-     * @param ticketDTO DTO containing ticket details
-     * @return The created ticket
-     */
     @PostMapping
     public ResponseEntity<TicketDTO> createTicket(@RequestBody TicketDTO ticketDTO) {
-        // Set the user ID from the authenticated user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         Optional<UserDTO> userOpt = userService.getUserByEmail(email);
@@ -183,23 +137,14 @@ public class TicketController {
             return ResponseEntity.status(403).build();
         }
 
-        // Set the user ID
         ticketDTO.setUserId(userOpt.get().getId());
 
-        // Create the ticket
         TicketDTO createdTicket = ticketService.createTicket(ticketDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTicket);
     }
 
-    /**
-     * Confirm a ticket
-     *
-     * @param id Ticket ID
-     * @return The confirmed ticket
-     */
     @PostMapping("/{id}/confirm")
     public ResponseEntity<TicketDTO> confirmTicket(@PathVariable Long id) {
-        // Check if user is authorized
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         Optional<UserDTO> userOpt = userService.getUserByEmail(email);
@@ -216,7 +161,6 @@ public class TicketController {
 
         TicketDTO ticket = ticketOpt.get();
 
-        // Only allow the ticket owner or an admin to confirm the ticket
         if (!ticket.getUserId().equals(userOpt.get().getId()) && userOpt.get().getRole() != Role.ADMIN) {
             return ResponseEntity.status(403).build();
         }
@@ -225,15 +169,8 @@ public class TicketController {
         return ResponseEntity.ok(confirmedTicket);
     }
 
-    /**
-     * Cancel a ticket
-     *
-     * @param id Ticket ID
-     * @return The cancelled ticket
-     */
     @PostMapping("/{id}/cancel")
     public ResponseEntity<TicketDTO> cancelTicket(@PathVariable Long id) {
-        // Check if user is authorized
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         Optional<UserDTO> userOpt = userService.getUserByEmail(email);
@@ -250,7 +187,6 @@ public class TicketController {
 
         TicketDTO ticket = ticketOpt.get();
 
-        // Only allow the ticket owner or an admin to cancel the ticket
         if (!ticket.getUserId().equals(userOpt.get().getId()) && userOpt.get().getRole() != Role.ADMIN) {
             return ResponseEntity.status(403).build();
         }
@@ -259,13 +195,6 @@ public class TicketController {
         return ResponseEntity.ok(cancelledTicket);
     }
 
-    /**
-     * Update a ticket
-     *
-     * @param id Ticket ID
-     * @param ticketDTO DTO containing updated ticket details
-     * @return The updated ticket
-     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TicketDTO> updateTicket(@PathVariable Long id, @RequestBody TicketDTO ticketDTO) {
@@ -273,12 +202,6 @@ public class TicketController {
         return ResponseEntity.ok(updatedTicket);
     }
 
-    /**
-     * Get tickets by status for the current user
-     *
-     * @param status Ticket status
-     * @return List of tickets with the specified status
-     */
     @GetMapping("/status/{status}")
     public ResponseEntity<List<TicketDTO>> getTicketsByStatus(@PathVariable TicketStatus status) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -293,12 +216,6 @@ public class TicketController {
         return ResponseEntity.ok(tickets);
     }
 
-    /**
-     * Download ticket as PDF
-     *
-     * @param id Ticket ID
-     * @return PDF file
-     */
     @GetMapping("/{id}/pdf")
     public ResponseEntity<byte[]> downloadTicketPdf(@PathVariable Long id) {
         Optional<TicketDTO> ticketOpt = ticketService.getTicketById(id);
